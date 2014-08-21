@@ -1,4 +1,4 @@
-(defproject arohner/wait-for "1.0.1"
+(defproject arohner/wait-for "1.0.2"
   :description "a HOF for specifying retries"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clj-time "0.8.0"]
