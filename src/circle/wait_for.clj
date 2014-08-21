@@ -59,11 +59,8 @@
      (and result (not success-fn)) true
      :else false)))
 
-(defn period->secs [p]
-  (-> p .toStandardSeconds .getSeconds))
-
 (defn period->millis [p]
-  (-> p period->secs (* 1000)))
+  (-> p .toStandardDuration .getMillis))
 
 (defn fail
   "stuff to do when an iteration fails. Returns new options"
