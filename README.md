@@ -1,7 +1,9 @@
 wait-for
 ========
 
-[circle/wait-for "1.0.0]
+```clojure
+[arohner/wait-for "1.0.2"]
+```
 
 A HOF that provides retrying.
 
@@ -40,4 +42,4 @@ By default, wait-for does not catch exceptions, but can be configured to do so:
 
 The :catch clause can take numerous options, as seen in the docstring.
 
-Inspired by [https://github.com/joegallo/robert-bruce Robert Bruce]
+Inspired by [https://github.com/joegallo/robert-bruce](Robert Bruce)
