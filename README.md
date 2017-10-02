@@ -78,3 +78,7 @@ By default, call f, and retry (by calling again), if f returns falsey.
 The :catch clause can take numerous options, as seen in the docstring.
 
 Inspired by [Robert Bruce](https://github.com/joegallo/robert-bruce)
+
+License
+-------
+EPL 1.0, the same as Clojure
