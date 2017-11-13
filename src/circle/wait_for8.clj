@@ -1,4 +1,4 @@
-(ns circle.wait-for.java-time
+(ns circle.wait-for8
   (:require [clojure.spec.alpha :as s]
             [java-time :as time]
             [slingshot.slingshot :refer (try+ throw+)]))
@@ -12,7 +12,8 @@
 (defn catch-dispatch [options throwable]
   (let [{:keys [catch]} options
         throwable? (instance? Throwable throwable)
-        caught-map? (map? throwable)]
+        caught-map? (or (map? throwable)
+                        (instance? clojure.lang.ExceptionInfo throwable))]
     (cond
      (nil? catch) :default
      (and throwable? (sequential? catch) (seq catch) (every? #(isa? % Throwable) catch)) :seq-throwables
@@ -87,13 +88,15 @@
                        :f f})
           (throw+))))))
 
-(s/def ::sleep time/duration?)
+(s/def ::sleep (s/nilable time/duration?))
 (s/def ::tries (s/or :int nat-int? :unlimited #{:unlimited}))
 (s/def ::timeout time/duration?)
 (s/def ::slingshot-tuple (s/tuple keyword? any?))
-(defn exception? [x]
-  (instance? Exception x))
-(s/def ::catch (s/or :e (s/coll-of exception?) :f fn? :k keyword? :slingshot ::slingshot-tuple))
+
+(defn exception-class? [x]
+  (isa? x Exception))
+
+(s/def ::catch (s/or :e (s/coll-of exception-class?) :f fn? :k keyword? :slingshot ::slingshot-tuple))
 (s/def ::success-fn (s/or :f fn? :no-throw #{:no-throw}))
 (s/def ::error-hook fn?)
 

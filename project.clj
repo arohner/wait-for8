@@ -1,10 +1,8 @@
-(defproject arohner/wait-for "1.0.2"
-  :description "a HOF for specifying retries"
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [clj-time "0.8.0"]
-                 [circle/util "1.0.0"]]
-  :profiles {:dev
-             {:dependencies
-              [[midje "1.5.0" :exclusions [org.clojure/clojure]]
-               [bond "0.2.5" :exclusions [org.clojure/clojure]]]}}
-  :plugins [[lein-midje "3.0.0"]])
+(defproject arohner/wait-for8 "1.0.0"
+  :description "wait-for, using java8 time instead of joda"
+  :dependencies [[org.clojure/clojure "1.9.0-RC1"]
+                 [clojure.java-time "0.3.0"]
+                 [slingshot "0.12.2"]]
+  :profiles {:dev {:dependencies [[circleci/bond "0.3.0"]]
+                   :exclusions [org.clojure/clojurescript
+                                com.cemerick/clojurescript.test]}})
