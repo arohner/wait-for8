@@ -1,5 +1,6 @@
 (ns circle.wait-for8
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.future :refer :all]
+            [clojure.spec.alpha :as s]
             [java-time :as time]
             [slingshot.slingshot :refer (try+ throw+)]))
 
