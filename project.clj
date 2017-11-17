@@ -1,4 +1,4 @@
-(defproject arohner/wait-for8 "1.0.3"
+(defproject arohner/wait-for8 "1.0.4-SNAPSHOT"
   :description "wait-for, using java8 time instead of joda"
   :license {:name "Eclipse Public License 1.0"
             :url "https://www.eclipse.org/legal/epl-v10.html"
