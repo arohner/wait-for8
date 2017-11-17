@@ -1,4 +1,4 @@
-(ns circle.wait-for.java-time
+(ns circle.wait-for
   (:require [clojure.spec.alpha :as s]
             [java-time :as time]
             [slingshot.slingshot :refer (try+ throw+)]))
