@@ -5,7 +5,7 @@
             [clojure.test :refer :all]
             [slingshot.slingshot :refer (try+ throw+)]
             [circle.wait-for8 :refer :all])
-  (:import java.io.IOException))
+  (:import java.io.IOException java.util.concurrent.ExecutionException))
 
 (stest/instrument (ns-publics 'circle.wait-for8))
 (defn foo []
@@ -18,6 +18,8 @@
   (are [val e ret] (= ret (catch-dispatch val e))
     {} (IOException.) :default
     {:catch [IOException]} (IOException.) :seq-throwables
+    {:catch [IOException ExecutionException]} (IOException.) :seq-throwables
+    {:catch [IOException ExecutionException]} (ExecutionException. "test" (IOException.)) :seq-throwables
     {:catch :foo} {:foo false} :slingshot-keyword
     {:catch [:foo :bar]} {:foo true} :slingshot-vector
     {:catch (fn [t] t)} (IOException.) :fn
@@ -27,6 +29,9 @@
   (are [opts e ret] (= ret (catch? opts e))
     {} (IOException.) false
     {:catch [IOException]} (IOException.) true
+    {:catch [ExecutionException IOException]} (ExecutionException. "test" (ArithmeticException.)) true
+    {:catch [IOException ExecutionException]} (ExecutionException. "test" (ArithmeticException.)) true
+    {:catch [ArithmeticException]} (ExecutionException. "test" (ArithmeticException.)) false
     {:catch :foo} {:foo true} true
     {:catch :foo} {:bar true} false
     {:catch [:foo :bar]} {} false
@@ -199,7 +204,7 @@
                 :tries 5}
                #((foo))))
     (is (= 2 (-> foo bond/calls count))))
-  
+
   (bond/with-stub! [[foo (stateful-fn
                           [#(throw (ex-info "throw :foo :bar" {:foo :bar}))
                            #(identity true)])]]
@@ -226,7 +231,7 @@
                               :tries 5}
                              foo)))
       (is (= 3 (-> foo bond/calls count)))))
-  
+
   (testing "throws"
     (bond/with-stub! [[foo (fn []
                              (throw (Exception. "test")))]]
