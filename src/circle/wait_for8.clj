@@ -59,7 +59,7 @@
 
 (s/fdef duration->millis :args (s/cat :d time/duration?) :ret int?)
 (defn duration->millis [d]
-  (-> d .getSeconds (* 1000)))
+  (-> d .toMillis))
 
 (defn fail
   "stuff to do when an iteration fails. Returns new options"
@@ -162,6 +162,6 @@
         options (-> options
                     (assoc :end-time end-time)
                     (assoc :tries tries)
-                    (assoc :sleep sleep))]    
+                    (assoc :sleep sleep))]
 
     (trampoline #(wait-for* {:options options :f f}))))
