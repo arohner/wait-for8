@@ -6,7 +6,8 @@ wait-for
 
 A Higher Order Function that provides declarative retrying.
 
-wait-for8 is a port of `arohner/wait-for`, which uses Java 8 instants and durations rather than joda time.
+`wait-for8` is a port of `arohner/wait-for`, using Java 8 instants and
+durations rather than joda time.
 
 Let's start with a simple example.
 
@@ -18,24 +19,6 @@ Let's start with a simple example.
 ```
 This calls unreliable-fn, up to 3 times, returning as soon as unreliable-fn returns truthy.
 
-Terminating
------------
-
-By default, wait-for terminates if `f` returns truthy. It returns the successful value, or throws if f never returned truthy.
-
-The number of retries can be specified with the options `:tries` and `:timeout`. If both are specified, the first one to trigger will cause termination.
-
-If you want to wait for a specific return value, use the `:success-fn` option.
-
-Exceptions
-----------
-
-By default, wait-for does not catch exceptions, but can be configured to do so. See `:catch` in the options
-
-```clojure
-(wait-for {:catch [java.net.SocketTimeoutException]} #(foo name))
-```
-
 Options
 -------
 wait-for has two signatures:
@@ -45,7 +28,19 @@ By default, call f, and retry (by calling again), if f returns falsey.
 
  - f - a fn of no arguments.
 
- Options:
+Terminating:
+
+By default, wait-for terminates if `f` returns truthy. It returns the
+successful value, or throws if f never returned truthy.
+
+The number of retries can be specified with the options `:tries` and
+`:timeout`. If both are specified, the first one to trigger will cause
+termination.
+
+If you want to wait for a specific return value, use the `:success-fn`
+option.
+
+Options:
 
  - sleep: how long to sleep between retries, as a java8 duration. Defaults to 1 second.
 
