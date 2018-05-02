@@ -1,16 +1,17 @@
 wait-for
 ========
 
-```clojure
-[arohner/wait-for "1.0.2"]
-```
+[![Clojars Project](https://img.shields.io/clojars/v/arohner/wait-for8.svg)](https://clojars.org/arohner/wait-for8)
+
 
 A Higher Order Function that provides declarative retrying.
+
+wait-for8 is a port of `arohner/wait-for`, which uses Java 8 instants and durations rather than joda time.
 
 Let's start with a simple example.
 
 ```clojure
-(:require [circle.wait-for :refer (wait-for)])
+(:require [circle.wait-for8 :refer (wait-for)])
 
 (wait-for #(unreliable-fn :foo :bar))
 
@@ -46,36 +47,33 @@ By default, call f, and retry (by calling again), if f returns falsey.
 
  Options:
 
- - sleep: how long to sleep between retries, as a clj-time/joda
-   period. Defaults to 1 second.
+ - sleep: how long to sleep between retries, as a java8 duration. Defaults to 1 second.
 
  - tries: number of times to retry before throwing. An integer,
-   or `:unlimited`. Defaults to 3 (or unlimited if timeout is given, and tries is not)
+   or `:unlimited`. Defaults to 3 (or unlimited if `:timeout` is given, and `:tries` is not)
 
- - timeout: a joda period. Stop retrying when period has elapsed,
+ - timeout: a java8 duration. Stop retrying when period has elapsed,
    regardless of how many tries are left.
 
  - catch: By default, wait-for does not catch exceptions. Pass this to specify which exceptions should be caught and retried
      Can be one of several things:
      - a collection of exception classes to catch and retry on
      - a fn that takes one argument, the thrown exception. Retry if the fn returns truthy.
-     - if the exception is a [slingshot](https://github.com/scgilardi/slingshot) throwing a map, can be a
+     - if the exception throws `ex-info`, catch can be a
        keyword, or a vector of a key and value, destructuring
        slingshot-style. Retry if the value obtained by destructuring is truthy
 
    If the exception matches the catch clause, wait-for
    retries. Otherwise the exception is thrown.
 
- - success-fn: a fn of one argument, the return value of f. Stop
-   retrying if success-fn returns truthy. If not specified, wait-for
-   returns when f returns truthy. May pass `:no-throw` here, which will
-   return truthy when f doesn't throw.
+ - success-fn: a predicate, will be called with the return value of
+   `f`. Stop retrying if success-fn returns truthy. If not specified,
+   wait-for returns when `(f)` returns truthy. May pass `:no-throw`
+   here, which will return truthy when f doesn't throw.
 
  - error-hook: a fn of one argument, an exception. Called every time
    fn throws, before the catch clause decides what to do with the
    exception. This is useful for e.g. logging.
-
-The :catch clause can take numerous options, as seen in the docstring.
 
 Inspired by [Robert Bruce](https://github.com/joegallo/robert-bruce)
 
