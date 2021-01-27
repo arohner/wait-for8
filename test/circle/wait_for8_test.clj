@@ -241,10 +241,8 @@
       (is (= 1 (-> foo bond/calls count))))))
 
 (deftest backoff-fn
-  (testing "never-negative"
-    (is (every? (complement neg?) (take 50 (repeatedly (exponential-backoff-fn {:seed 123 ;; will generate a jitter value > 10
-                                                                                :base (time/millis 10)
-                                                                                :jitter (time/millis 1000)}))))))
+  (testing "conforms to spec"
+    (is (stest/check-fn ::sleep-fn (exponential-backoff-fn))))
   (testing "growing"
     (let [xs (take 50 (repeatedly (exponential-backoff-fn {:seed 123
                                                            :base (time/millis 1000)

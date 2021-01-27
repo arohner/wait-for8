@@ -126,7 +126,8 @@
                        :f f})
           (throw+))))))
 
-(s/def ::sleep (s/nilable (s/or :d time/duration? :f fn?)))
+(s/def ::sleep-fn (s/fspec :args (s/cat) :ret (complement neg?)))
+(s/def ::sleep (s/nilable (s/or :d time/duration? :f ::sleep-fn)))
 (s/def ::tries (s/or :int nat-int? :unlimited #{:unlimited}))
 (s/def ::timeout time/duration?)
 (s/def ::slingshot-tuple (s/tuple keyword? any?))
