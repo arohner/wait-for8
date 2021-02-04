@@ -1,4 +1,4 @@
-(defproject sh.griffin/wait-for8 "1.0.7-SNAPSHOT"
+(defproject sh.griffin/wait-for8 "1.0.7"
   :description "wait-for, using java8 time instead of joda"
   :url "https://github.com/griffinbank/wait-for8"
   :license {:name "Eclipse Public License 1.0"
