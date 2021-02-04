@@ -42,7 +42,13 @@ option.
 
 Options:
 
- - sleep: how long to sleep between retries, as a java8 duration. Defaults to 1 second.
+ - sleep: how long to sleep between retries, either as a java8
+   duration or as a no-arg function returning a long millis value. The function
+   will be called after each failure to retrieve a new value.
+   A call to `(exponential-backoff-fn)` will create a suitable fn
+   to implement exponential backoff with jitter strategy.
+  
+   Defaults to 1s.
 
  - tries: number of times to retry before throwing. An integer,
    or `:unlimited`. Defaults to 3 (or unlimited if `:timeout` is given, and `:tries` is not)
