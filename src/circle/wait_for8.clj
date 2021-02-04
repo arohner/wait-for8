@@ -1,7 +1,8 @@
 (ns circle.wait-for8
   (:require [clojure.spec.alpha :as s]
             [java-time :as time]
-            [slingshot.slingshot :refer (try+ throw+)]))
+            [slingshot.slingshot :refer (try+ throw+)])
+  (:import [java.util Random]))
 
 (defn parse-args [args]
   (if (map? (first args))
@@ -60,11 +61,48 @@
 (defn duration->millis [d]
   (-> d .toMillis))
 
+(s/def ::base time/duration?)
+(s/def ::mult number?)
+(s/def ::jitter time/duration?)
+(s/def ::seed number?)
+
+(s/fdef exponential-backoff-fn :args (s/keys opt-un [::base ::mult ::jitter ::seed]))
+(defn exponential-backoff-fn
+  "Returns an impure function, suitable for passing as a sleep argument
+  to wait-for, that implements an exponential back-off with optional
+  jitter.
+
+  With no-args the delay will be ~1s initially, grow 1.25 with each
+  retry and have 100ms of jitter
+
+  algorithm is:
+      max(0,
+          base * mult^n +/- (jitter/2))
+
+  n is the retry number
+  base and jitter specified as java duration
+  "
+  ([]
+   (exponential-backoff-fn {}))
+  ([{:keys [base mult jitter seed ]
+     :or {base (time/millis 900)
+          mult 1.25
+          jitter (time/millis 100)}}]
+   (let [n (atom 0)
+         rnd (if seed (Random. seed) (Random.))
+         base-ms (-> base duration->millis)
+         jitter-ms (-> jitter duration->millis)]
+     (fn [] (long (max 0 (+ (* base-ms (Math/pow mult (swap! n inc)))
+                            (- (/ jitter-ms 2) (.nextInt rnd jitter-ms)))))))))
+
 (defn fail
   "stuff to do when an iteration fails. Returns new options"
-  [options]
-  (when (-> options :sleep)
-    (Thread/sleep (-> options :sleep duration->millis)))
+  [{:keys [sleep] :as options}]
+  (when sleep
+    (let [t (if (fn? sleep)
+              (sleep)
+              (-> sleep duration->millis))]
+      (Thread/sleep t)))
   (update-in options [:tries] (fn [tries]
                                 (if (integer? tries)
                                   (dec tries)
@@ -88,7 +126,8 @@
                        :f f})
           (throw+))))))
 
-(s/def ::sleep (s/nilable time/duration?))
+(s/def ::sleep-fn (s/fspec :args (s/cat) :ret (complement neg?)))
+(s/def ::sleep (s/nilable (s/or :d time/duration? :f ::sleep-fn)))
 (s/def ::tries (s/or :int nat-int? :unlimited #{:unlimited}))
 (s/def ::timeout time/duration?)
 (s/def ::slingshot-tuple (s/tuple keyword? any?))
@@ -116,7 +155,13 @@
 
  Options:
 
- - sleep: how long to sleep between retries, as a java8 duration. Defaults to 1s.
+  - sleep: how long to sleep between retries, either as a java8
+    duration or as a no-arg function returning a long millis value. The function
+    will be called after each failure to retrieve a new value.
+    A call to (exponential-backoff-fn) will create a suitable fn
+    to implement exponential backoff with jitter strategy.
+
+    Defaults to 1s.
 
  - tries: number of times to retry before throwing. An integer,
    or :unlimited. Defaults to 3 (or unlimited if :timeout is given, and :tries is not)

@@ -239,3 +239,26 @@
                                         :tries 5}
                                        foo)))
       (is (= 1 (-> foo bond/calls count))))))
+
+(deftest backoff-fn
+  (testing "conforms to spec"
+    (is (stest/check-fn ::sleep-fn (exponential-backoff-fn))))
+  (testing "growing"
+    (let [xs (take 50 (repeatedly (exponential-backoff-fn {:seed 123
+                                                           :base (time/millis 1000)
+                                                           :jitter (time/millis 10)})))]
+      (is (= xs (sort xs))))))
+
+(deftest sleep-as-fn
+  (testing "success"
+    (let [sleep-fn-called? (atom false)]
+      (bond/with-stub! [[foo (fn []
+                               (throw (Exception. "test")))]]
+        (is (thrown? Exception
+                     (wait-for {:catch (let [f (stateful-fn [true true false])]
+                                         (fn [e] (f)))
+                                :sleep (fn [] (reset! sleep-fn-called? true) 1000)
+                                :tries 5}
+                               foo)))
+        (is sleep-fn-called?)
+        (is (= 3 (-> foo bond/calls count)))))))
