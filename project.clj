@@ -16,6 +16,6 @@
   :plugins [[s3-wagon-private "1.3.4"]]
 
   ;; this isn't actually no-auth, it uses the standard AWS auth mechanisms
-  :repositories [["releases" {:url "s3p://griffin-maven-development" :no-auth true}]
-                 ["snapshots" {:url "s3p://griffin-maven-development" :no-auth true}]]
+  :repositories [["releases" {:url "s3p://griffin-maven-dev-eu-west-2/release" :no-auth true}]
+                 ["snapshots" {:url "s3p://griffin-maven-dev-eu-west-2/snapshot" :no-auth true}]]
   )
